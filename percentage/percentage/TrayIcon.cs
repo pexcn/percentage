@@ -74,7 +74,6 @@ namespace percentage
             PowerStatus powerStatus = SystemInformation.PowerStatus;
             String percentage = (powerStatus.BatteryLifePercent * 100).ToString();
             bool isCharging = SystemInformation.PowerStatus.PowerLineStatus == PowerLineStatus.Online;
-            String bitmapText = isCharging ? percentage + "*" : percentage;
             Color bitmapColor;
             RegistryKey key = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Themes\Personalize");
             if (key != null)
@@ -86,7 +85,7 @@ namespace percentage
             {
                 bitmapColor = Color.White;
             }
-            using (Bitmap bitmap = new Bitmap(GetTextBitmap(bitmapText, new Font(font, fontSize), bitmapColor)))
+            using (Bitmap bitmap = new Bitmap(GetTextBitmap(percentage, new Font(font, fontSize), bitmapColor)))
             {
                 System.IntPtr intPtr = bitmap.GetHicon();
                 try
