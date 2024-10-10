@@ -73,6 +73,10 @@ namespace percentage
         {
             PowerStatus powerStatus = SystemInformation.PowerStatus;
             String percentage = (powerStatus.BatteryLifePercent * 100).ToString();
+            if (int.Parse(percentage) > 99)
+            {
+                percentage = "FL";
+            }
             bool isCharging = SystemInformation.PowerStatus.PowerLineStatus == PowerLineStatus.Online;
             Color bitmapColor;
             RegistryKey key = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Themes\Personalize");
