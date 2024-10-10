@@ -11,7 +11,7 @@ namespace percentage
         static extern bool DestroyIcon(IntPtr handle);
 
         private const int fontSize = 18;
-        private const string font = "Segoe UI";
+        private const string font = "Microsoft YaHei";
 
         private NotifyIcon notifyIcon;
 
@@ -47,7 +47,7 @@ namespace percentage
                 using (Brush brush = new SolidBrush(fontColor))
                 {
                     graphics.DrawString(text, font, brush, 0, 0);
-                    graphics.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAlias;
+                    graphics.TextRenderingHint = System.Drawing.Text.TextRenderingHint.ClearTypeGridFit;
                     graphics.Save();
                 }
             }
