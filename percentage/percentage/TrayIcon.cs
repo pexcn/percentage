@@ -47,7 +47,7 @@ namespace percentage
                 graphics.Clear(Color.FromArgb(0, 0, 0, 0));
                 using (Brush brush = new SolidBrush(fontColor))
                 {
-                    graphics.DrawString(text, font, brush, 0, 0);
+                    graphics.DrawString(text, font, brush, 0, 2.0F);
                     graphics.TextRenderingHint = System.Drawing.Text.TextRenderingHint.ClearTypeGridFit;
                     graphics.Save();
                 }
