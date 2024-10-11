@@ -22,7 +22,7 @@ jobs:
 
     - name: Build Solution
       working-directory: percentage
-      run: msbuild percentage.sln -property:Configuration=$env:Configuration
+      run: msbuild percentage.sln /property:Configuration=$env:Configuration
       env:
         Configuration: ${{ matrix.configuration }}
 

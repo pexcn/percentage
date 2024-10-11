@@ -23,16 +23,15 @@ namespace percentage
         public TrayIcon()
         {
             ContextMenu contextMenu = new ContextMenu();
-            MenuItem menuItem = new MenuItem();
+            MenuItem exitItem = new MenuItem();
+
+            contextMenu.MenuItems.AddRange(new MenuItem[] { exitItem });
+
+            exitItem.Click += new System.EventHandler(ExitItemClick);
+            exitItem.Index = 0;
+            exitItem.Text = "退出";
 
             notifyIcon = new NotifyIcon();
-
-            contextMenu.MenuItems.AddRange(new MenuItem[] { menuItem });
-
-            menuItem.Click += new System.EventHandler(MenuItemClick);
-            menuItem.Index = 0;
-            menuItem.Text = "退出";
-
             notifyIcon.ContextMenu = contextMenu;
             notifyIcon.Visible = true;
 
@@ -81,7 +80,7 @@ namespace percentage
             return graphics.MeasureString(text, font);
         }
 
-        private void MenuItemClick(object sender, EventArgs e)
+        private void ExitItemClick(object sender, EventArgs e)
         {
             notifyIcon.Visible = false;
             notifyIcon.Dispose();
