@@ -167,12 +167,12 @@ namespace percentage
             }
         }
 
-        private void LogToFile(string percentage, bool isCharging)
+        private async void LogToFile(string percentage, bool isCharging)
         {
             if (isLogging && logWriter != null)
             {
-                logWriter.WriteLine($"[{DateTime.Now}]: {(isCharging ? "正在充电" : "使用电池")} -> {percentage}%");
-                logWriter.Flush();
+                await logWriter.WriteLineAsync($"[{DateTime.Now}]: {(isCharging ? "正在充电" : "使用电池")} -> {percentage}%");
+                await logWriter.FlushAsync();
             }
         }
     }
