@@ -15,6 +15,7 @@ namespace percentage
         private const string font = "Microsoft YaHei";
 
         private NotifyIcon notifyIcon;
+        private Font textFont;
         private Color themeColor;
 
         public TrayIcon()
@@ -28,15 +29,16 @@ namespace percentage
 
             menuItem.Click += new System.EventHandler(MenuItemClick);
             menuItem.Index = 0;
-            menuItem.Text = "E&xit";
+            menuItem.Text = "退出";
 
             notifyIcon.ContextMenu = contextMenu;
             notifyIcon.Visible = true;
 
+            textFont = new Font(font, fontSize);
             themeColor = GetSystemThemeColor();
 
             Timer timer = new Timer();
-            timer.Interval = 1000;
+            timer.Interval = 3000;
             timer.Tick += new EventHandler(TimerTick);
             timer.Start();
         }
@@ -74,7 +76,7 @@ namespace percentage
         {
             using (Image image = new Bitmap(1, 1))
             using (Graphics graphics = Graphics.FromImage(image))
-                return graphics.MeasureString(text, font);
+            return graphics.MeasureString(text, font);
         }
 
         private void MenuItemClick(object sender, EventArgs e)
@@ -92,16 +94,20 @@ namespace percentage
             {
                 percentage = "FL";
             }
-            bool isCharging = SystemInformation.PowerStatus.PowerLineStatus == PowerLineStatus.Online;
-            using (Bitmap bitmap = new Bitmap(GetTextBitmap(percentage, new Font(font, fontSize), themeColor)))
+            bool isCharging = powerStatus.PowerLineStatus == PowerLineStatus.Online;
+            using (Bitmap bitmap = new Bitmap(GetTextBitmap(percentage, textFont, themeColor)))
             {
                 System.IntPtr intPtr = bitmap.GetHicon();
                 try
                 {
+                    if (notifyIcon.Icon != null)
+                    {
+                        notifyIcon.Icon.Dispose();
+                    }
                     using (Icon icon = Icon.FromHandle(intPtr))
                     {
                         notifyIcon.Icon = icon;
-                        String toolTipText = percentage + "%" + (isCharging ? " Charging" : "");
+                        String toolTipText = (isCharging ? "充电中：" : "使用电池：") + percentage + "%";
                         notifyIcon.Text = toolTipText;
                     }
                 }
