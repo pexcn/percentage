@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Drawing;
+using System.IO;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using Microsoft.Win32;
@@ -19,16 +21,24 @@ namespace percentage
         private Color themeColor;
         private String lastPercentage = string.Empty;
         private bool lastIsCharging = false;
+        private bool isLogging = false;
+        private StreamWriter logWriter;
 
         public TrayIcon()
         {
             ContextMenu contextMenu = new ContextMenu();
+            MenuItem logItem = new MenuItem();
             MenuItem exitItem = new MenuItem();
 
-            contextMenu.MenuItems.AddRange(new MenuItem[] { exitItem });
+            contextMenu.MenuItems.AddRange(new MenuItem[] { logItem, exitItem });
+
+            logItem.Click += new System.EventHandler(LogItemClick);
+            logItem.Index = 0;
+            logItem.Text = "电量日志";
+            logItem.Checked = false;
 
             exitItem.Click += new System.EventHandler(ExitItemClick);
-            exitItem.Index = 0;
+            exitItem.Index = 1;
             exitItem.Text = "退出";
 
             notifyIcon = new NotifyIcon();
@@ -80,6 +90,33 @@ namespace percentage
             return graphics.MeasureString(text, font);
         }
 
+        private void LogItemClick(object sender, EventArgs e)
+        {
+            MenuItem logItem = (MenuItem)sender;
+            logItem.Checked = !logItem.Checked;
+            isLogging = logItem.Checked;
+
+            if (isLogging)
+            {
+                String progName = Assembly.GetExecutingAssembly().GetName().Name;
+                String date = DateTime.Now.ToString("yyyyMMdd");
+                String logFile = Path.Combine(Path.GetTempPath(), $"{progName}-{date}.log");
+                logWriter = new StreamWriter(logFile, true);
+                logWriter.WriteLine($"[{DateTime.Now}]: 开启电量日志");
+                logWriter.Flush();
+            }
+            else
+            {
+                if (logWriter != null)
+                {
+                    logWriter.WriteLine($"[{DateTime.Now}]: 关闭电量日志");
+                    logWriter.Flush();
+                    logWriter.Close();
+                    logWriter = null;
+                }
+            }
+        }
+
         private void ExitItemClick(object sender, EventArgs e)
         {
             notifyIcon.Visible = false;
@@ -102,6 +139,7 @@ namespace percentage
             lastIsCharging = isCharging;
 
             UpdateTrayIcon(percentage, isCharging);
+            LogToFile(percentage, isCharging);
         }
 
         private void UpdateTrayIcon(string percentage, bool isCharging)
@@ -126,6 +164,15 @@ namespace percentage
                 {
                     DestroyIcon(intPtr);
                 }
+            }
+        }
+
+        private void LogToFile(string percentage, bool isCharging)
+        {
+            if (isLogging && logWriter != null)
+            {
+                logWriter.WriteLine($"[{DateTime.Now}]: {(isCharging ? "正在充电" : "使用电池")} -> {percentage}%");
+                logWriter.Flush();
             }
         }
     }
