@@ -17,6 +17,8 @@ namespace percentage
         private NotifyIcon notifyIcon;
         private Font textFont;
         private Color themeColor;
+        private String lastPercentage = string.Empty;
+        private bool lastIsCharging = false;
 
         public TrayIcon()
         {
@@ -95,6 +97,14 @@ namespace percentage
                 percentage = "FL";
             }
             bool isCharging = powerStatus.PowerLineStatus == PowerLineStatus.Online;
+
+            if (percentage == lastPercentage && isCharging == lastIsCharging)
+            {
+                return;
+            }
+            lastPercentage = percentage;
+            lastIsCharging = isCharging;
+
             using (Bitmap bitmap = new Bitmap(GetTextBitmap(percentage, textFont, themeColor)))
             {
                 System.IntPtr intPtr = bitmap.GetHicon();
