@@ -40,7 +40,7 @@ namespace percentage
             themeColor = GetSystemThemeColor();
 
             Timer timer = new Timer();
-            timer.Interval = 3000;
+            timer.Interval = 5000;
             timer.Tick += new EventHandler(TimerTick);
             timer.Start();
         }
@@ -91,11 +91,8 @@ namespace percentage
         private void TimerTick(object sender, EventArgs e)
         {
             PowerStatus powerStatus = SystemInformation.PowerStatus;
-            String percentage = (powerStatus.BatteryLifePercent * 100).ToString();
-            if (int.Parse(percentage) > 99)
-            {
-                percentage = "FL";
-            }
+            int batteryPercentage = (int)Math.Round(powerStatus.BatteryLifePercent * 100);
+            String percentage = batteryPercentage > 99 ? "FL" : batteryPercentage.ToString();
             bool isCharging = powerStatus.PowerLineStatus == PowerLineStatus.Online;
 
             if (percentage == lastPercentage && isCharging == lastIsCharging)
@@ -105,6 +102,11 @@ namespace percentage
             lastPercentage = percentage;
             lastIsCharging = isCharging;
 
+            UpdateTrayIcon(percentage, isCharging);
+        }
+
+        private void UpdateTrayIcon(string percentage, bool isCharging)
+        {
             using (Bitmap bitmap = new Bitmap(GetTextBitmap(percentage, textFont, themeColor)))
             {
                 System.IntPtr intPtr = bitmap.GetHicon();
@@ -117,7 +119,7 @@ namespace percentage
                     using (Icon icon = Icon.FromHandle(intPtr))
                     {
                         notifyIcon.Icon = icon;
-                        String toolTipText = (isCharging ? "充电中：" : "使用电池：") + percentage + "%";
+                        String toolTipText = (isCharging ? "正在充电：" : "使用电池：") + percentage + "%";
                         notifyIcon.Text = toolTipText;
                     }
                 }
