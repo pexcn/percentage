@@ -15,6 +15,7 @@ namespace percentage
         private const string font = "Microsoft YaHei";
 
         private NotifyIcon notifyIcon;
+        private Color themeColor;
 
         public TrayIcon()
         {
@@ -32,10 +33,24 @@ namespace percentage
             notifyIcon.ContextMenu = contextMenu;
             notifyIcon.Visible = true;
 
+            themeColor = GetSystemThemeColor();
+
             Timer timer = new Timer();
             timer.Interval = 1000;
             timer.Tick += new EventHandler(TimerTick);
             timer.Start();
+        }
+
+        private Color GetSystemThemeColor()
+        {
+            RegistryKey key = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Themes\Personalize");
+            if (key != null)
+            {
+                bool isLightTheme = (int)key.GetValue("SystemUsesLightTheme") == 1;
+                key.Close();
+                return isLightTheme ? Color.Black : Color.White;
+            }
+            return Color.White;
         }
 
         private Bitmap GetTextBitmap(String text, Font font, Color fontColor)
@@ -78,18 +93,7 @@ namespace percentage
                 percentage = "FL";
             }
             bool isCharging = SystemInformation.PowerStatus.PowerLineStatus == PowerLineStatus.Online;
-            Color bitmapColor;
-            RegistryKey key = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Themes\Personalize");
-            if (key != null)
-            {
-                bitmapColor = (int)key.GetValue("SystemUsesLightTheme") == 0 ? Color.White : Color.Black;
-                key.Close();
-            }
-            else
-            {
-                bitmapColor = Color.White;
-            }
-            using (Bitmap bitmap = new Bitmap(GetTextBitmap(percentage, new Font(font, fontSize), bitmapColor)))
+            using (Bitmap bitmap = new Bitmap(GetTextBitmap(percentage, new Font(font, fontSize), themeColor)))
             {
                 System.IntPtr intPtr = bitmap.GetHicon();
                 try
